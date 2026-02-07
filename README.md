@@ -15,6 +15,6 @@ const [isOpen, toggle] = useToggle(false);
 const debouncedValue = useDebounce("search", 500);
 const [name, setName] = useLocalStorage("name", "Mitra");
 
-// Example usage
+### Example usage
 console.log(isOpen, debouncedValue, name);
 
