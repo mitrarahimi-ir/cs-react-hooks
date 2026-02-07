@@ -84,6 +84,6 @@ export default App;
 ## Installation
 
 npm install cs-react-hooks
-||
+## OR
 yarn add cs-react-hooks
 
