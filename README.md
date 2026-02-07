@@ -6,11 +6,6 @@ Currently included hooks:
 - `useToggle` - Toggle boolean state easily  
 - `useDebounce` - Debounce a value for inputs, API calls, etc.  
 - `useLocalStorage` - Synchronize state with localStorage  
-- `useFetch` - Fetch data from APIs with loading & error state  
-- `useInterval` - Set up intervals safely in React  
-- `usePrevious` - Get the previous value of a state or prop  
-- `useMediaQuery` - Track media query matches for responsive designs  
-- `useOnClickOutside` - Detect clicks outside a referenced element  
 
 **Note:** Full usage examples are included **inside each hook file** as:
 
@@ -27,21 +22,16 @@ All hooks can be imported from a single entry point:
 import {
   useToggle,
   useDebounce,
-  useLocalStorage,
-  useFetch,
-  useInterval,
-  usePrevious,
-  useMediaQuery,
-  useOnClickOutside
-} from "react-hooks";
+  useLocalStorage
+} from "cs-react-hooks";
 ```
 
 ## Quick Example
 ```
 import React, { useState, useEffect } from "react";
-import { useToggle, useDebounce, useLocalStorage } from "react-hooks";
+import { useToggle, useDebounce, useLocalStorage } from "cs-react-hooks";
 
-function Demo() {
+function App() {
   const [isOpen, toggle] = useToggle(false);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 500);
@@ -76,7 +66,7 @@ function Demo() {
   );
 }
 
-export default Demo;
+export default App;
 ```
 
 ## Notes
@@ -93,7 +83,7 @@ export default Demo;
 
 ## Installation
 
-npm install react-hooks
+npm install cs-react-hooks
 # or
-yarn add react-hooks
+yarn add cs-react-hooks
 
