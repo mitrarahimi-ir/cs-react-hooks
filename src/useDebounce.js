@@ -1,70 +1,97 @@
 import { useState, useEffect } from "react";
 
 /**
- * useDebounce - Debounces a value, delaying its update until after a specified delay.
- * This is useful for limiting the rate of executing expensive operations like API calls.
+ * useLocalStorage Hook
+ * --------------------
+ * A custom React hook that synchronizes a state variable with localStorage.
  *
- * @param {any} value - The value to debounce.
- * @param {number} delay - The debounce delay in milliseconds (default is 500ms).
- * @returns {any} - The debounced value.
+ * Features:
+ * 1. Initializes state from localStorage if available, otherwise uses the provided initial value.
+ * 2. Updates localStorage whenever the state changes.
+ * 3. Listens for localStorage changes from other tabs and updates state accordingly.
+ *
+ * @param {string} key - The key under which the value is stored in localStorage.
+ * @param {any} initialValue - The default value to use if the key is not found in localStorage.
+ * @returns {[any, Function]} Returns a tuple: [value, setValue]
  *
  * @example
- * import React, { useState, useEffect } from "react";
- * import { useDebounce } from "react-hooks";
+ * // Example 1: Using with a simple string value
+ * const [name, setName] = useLocalStorage("userName", "Mitra");
+ * setName("Mehrad");
  *
- * const [query, setQuery] = useState("");
- * const debouncedQuery = useDebounce(query, 500);
+ * // Example 2: Using a setter function to update previous state
+ * setName(prev => prev + " Khan"); // Concatenates previous value
  *
- * useEffect(() => {
- *   if (debouncedQuery) {
- *     // Example: perform API call with debouncedQuery
- *     console.log("Search API call with:", debouncedQuery);
- *   }
- * }, [debouncedQuery]);
+ * // Example 3: Using with objects
+ * const [settings, setSettings] = useLocalStorage("settings", { darkMode: false });
+ * setSettings(prev => ({ ...prev, darkMode: true }));
+ *
+ * // Example 4: Works across browser tabs
+ * // If "settings" changes in another tab, this hook updates automatically.
  */
-export default function useDebounce(value, delay = 500) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
+function useLocalStorage(key, initialValue) {
+  // Initialize state from localStorage or fallback to initialValue
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      // Parse the stored JSON value or return the initial value if not found
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(`useLocalStorage: Error reading key "${key}"`, error);
+      return initialValue;
+    }
+  });
 
+  /**
+   * Setter function to update state and localStorage
+   * @param {any | Function} value - New value or a function receiving the previous state
+   *
+   * Usage:
+   * setValue(newValue);          // Set directly
+   * setValue(prev => prev + 1);  // Functional update based on previous state
+   */
+  const setValue = (value) => {
+    try {
+      // Determine new value (support functional updates)
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value;
+
+      // Update React state
+      setStoredValue(valueToStore);
+
+      // Update localStorage
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(`useLocalStorage: Error setting key "${key}"`, error);
+    }
+  };
+
+  /**
+   * Listen for localStorage changes from other tabs/windows
+   * and update state if the relevant key changes.
+   */
   useEffect(() => {
-    // Set a timeout to update the debounced value after the delay
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    // Cleanup the timeout if value or delay changes, or on unmount
-    return () => {
-      clearTimeout(handler);
+    const handleStorageChange = (event) => {
+      if (event.key === key) {
+        try {
+          setStoredValue(event.newValue ? JSON.parse(event.newValue) : null);
+        } catch (error) {
+          console.error(
+            `useLocalStorage: Error parsing storage event for key "${key}"`,
+            error,
+          );
+        }
+      }
     };
-  }, [value, delay]);
 
-  return debouncedValue;
+    window.addEventListener("storage", handleStorageChange);
+
+    // Cleanup listener on unmount
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [key]);
+
+  // Return the state and setter function
+  return [storedValue, setValue];
 }
 
-/*** Sample usage (commented) ***/
-// import React, { useState, useEffect } from "react";
-// import { useDebounce } from "react-hooks";
-
-// function DebounceDemo() {
-//   const [query, setQuery] = useState("");
-//   const debouncedQuery = useDebounce(query, 500);
-
-//   useEffect(() => {
-//     if (debouncedQuery) {
-//       console.log("API call with debounced value:", debouncedQuery);
-//     }
-//   }, [debouncedQuery]);
-
-//   return (
-//     <div>
-//       <input
-//         type="text"
-//         value={query}
-//         onChange={(e) => setQuery(e.target.value)}
-//         placeholder="Type to search"
-//       />
-//       <p>Debounced value: {debouncedQuery}</p>
-//     </div>
-//   );
-// }
-
-// export default DebounceDemo;
+export default useLocalStorage;

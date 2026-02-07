@@ -1,12 +1,16 @@
 {
-  "name": "react-hooks",
+  "name": "cs-react-hooks",
   "version": "1.0.0",
-  "description": "",
+  "description": "Custom React hooks library",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "react",
+    "hooks",
+    "custom-hooks"
+  ],
+  "author": "Mitra Rahimi",
+  "license": "MIT"
 }
